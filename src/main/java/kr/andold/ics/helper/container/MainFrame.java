@@ -7,30 +7,20 @@
 
 package kr.andold.ics.helper.container;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
 
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.PageLoadStrategy;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver.Window;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import kr.andold.utils.ChromeDriverWrapper;
+import kr.andold.ics.helper.service.ChromeService;
 import kr.andold.utils.Utility;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -44,7 +34,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JToggleButton;
 import javax.swing.border.BevelBorder;
 
 import java.awt.event.ActionEvent;
@@ -55,49 +44,9 @@ import java.awt.event.ActionListener;
 public class MainFrame extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private static final int COLUMN_SIZE = 5;
-
-	@Getter
-	private ChromeDriverWrapper driverClient;
-	@Getter
-	private String windowHandleClient;
-	@Getter
-	private Point seleniumPostion;
-	@Getter
-	private Dimension seleniumSize;
-
-	//	User Interfaces
-	@Getter
-	private JComboBox<Object> comboBoxGoStopAuto;	//	자동/수동/대기/무시
-	@Getter
-	private JCheckBox checkboxSkipRest;			//	나머지 작업
-	@Getter
-	private JCheckBox checkboxCloseAccount;		//	해지계좌
-	@Getter
-	private JToggleButton toggleButtonPlayPause;	//	Playing/Pause
-
-	@Getter
-	private static String webdriverPath;
-	@Value("${user.selenium.webdriver.chrome.driver}")
-	public void setWebdriverPath(String value) {
-		log.info("{} setWebdriverPath(『{}』)", Utility.indentMiddle(), value);
-		webdriverPath = value;
-	}
-
-	@Getter
-	private static String userDataDir;
-	@Value("${user.selenium.user.data.dir}")
-	public void setUserDataDir(String value) {
-		log.info("{} setUserDataDir(『{}』)", Utility.indentMiddle(), value);
-		userDataDir = value;
-	}
-
-	@Getter
-	private static String logPath;
-	@Value("${logging.file.path}")
-	public void setLogPath(String value) {
-		log.info("{} setLogPath(『{}』)", Utility.indentMiddle(), value);
-		logPath = value;
-	}
+	
+	@Autowired
+	private ChromeService chromeService;
 
 	public MainFrame() {
 		getContentPane().setLayout(new GridLayout(1, 0, 0, 0));
@@ -108,49 +57,22 @@ public class MainFrame extends JFrame implements ActionListener {
 		createMenu();
 	}
 
-	private java.awt.Dimension sizeByScreen(int w, int h) {
+	public static java.awt.Dimension sizeByScreen(int w, int h) {
 		java.awt.Rectangle maximumWindowBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 		return new java.awt.Dimension(((int)maximumWindowBounds.getWidth()) * w / 12, ((int)maximumWindowBounds.getHeight()) * h / 12);
 	}
 
-	private java.awt.Point locationByScreen(int w, int h) {
+	public static java.awt.Point locationByScreen(int w, int h) {
 		java.awt.Rectangle maximumWindowBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 		return new java.awt.Point((int)maximumWindowBounds.getX() + ((int)maximumWindowBounds.getWidth()) * w / 12, (int)maximumWindowBounds.getY() + ((int)maximumWindowBounds.getHeight()) * h / 12);
 
 	}
 
-	public Dimension sizeBySelenium(int w, int h) {
-		return new Dimension(seleniumSize.getWidth() * w / 12, seleniumSize.getHeight() * h / 12);
-	}
-
-	public Point positionBySelenium(int w, int h) {
-		return new Point(seleniumPostion.getX() + seleniumSize.getWidth() * w / 12, seleniumPostion.getY() + seleniumSize.getHeight() * h / 12);
-
-	}
-
 	private void initBrowsers() {
-		log.info("{} initBrowsers() - 『{}』 『{}』 『{}』", Utility.indentMiddle(), webdriverPath, userDataDir, logPath);
-		int marginBottom = 1;
+		log.info("{} initBrowsers()", Utility.indentMiddle());
 
 		setSize(sizeByScreen(COLUMN_SIZE, 2));
 		setLocation(locationByScreen(0, 0));
-		System.setProperty("webdriver.chrome.driver", getWebdriverPath());
-
-		ChromeOptions clientOptions = new ChromeOptions();
-		clientOptions.addArguments("--remote-allow-origins=*");
-		clientOptions.addArguments("--window-size=1024,768");
-		clientOptions.addArguments(String.format("--user-data-dir=%s", String.format("%s", userDataDir)));
-		clientOptions.addArguments("--disable-blink-features=AutomationControlled");
-		clientOptions.addArguments("--disable-dev-shm-usage");
-		clientOptions.addArguments("--disable-infobars");
-		clientOptions.setPageLoadStrategy(PageLoadStrategy.NONE);
-		driverClient = new ChromeDriverWrapper(clientOptions);
-		windowHandleClient = driverClient.getWindowHandle();
-		Window windowClient = driverClient.manage().window();
-
-		windowClient.setSize(sizeBySelenium(12 - COLUMN_SIZE, 12 - marginBottom));
-		windowClient.setPosition(positionBySelenium(COLUMN_SIZE, 0));
-		driverClient.manage().timeouts().implicitlyWait(Duration.ofSeconds(4));
 
 		log.info("{} initBrowsers()", Utility.indentMiddle());
 	}
@@ -195,11 +117,6 @@ public class MainFrame extends JFrame implements ActionListener {
 		initBrowsers();
 	}
 
-	@PreDestroy
-	public void freeResource() {
-		driverClient.quit();
-	}
-
 	private void createMenu(JMenu menu, String title, boolean enabled) {
 		JMenuItem jMenuItem = new JMenuItem(title);
 		jMenuItem.setEnabled(enabled);
@@ -211,8 +128,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menuBank = new JMenu("항목");
 		menuBar.add(menuBank);
-		createMenu(menuBank, "항목 1", true);
-		createMenu(menuBank, "항목 2", true);
+		createMenu(menuBank, "네이버", true);
 		menuBank.addSeparator();
 		createMenu(menuBank, "닫기", true);
 
@@ -225,9 +141,8 @@ public class MainFrame extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		String command = e.getActionCommand();
 		switch (command) { // 메뉴 아이템 구분
-		case "기업은행":
-			break;
-		case "농협은행":
+		case "네이버":
+			chromeService.crawl();
 			break;
 		case "닫기":
 			System.exit(0); // 시스템 종료
