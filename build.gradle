@@ -1,0 +1,103 @@
+buildscript {
+	repositories {
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
+	}
+	dependencies {
+		classpath("io.spring.gradle:dependency-management-plugin:1.1.4")
+		classpath("com.github.node-gradle:gradle-node-plugin:7.0.2")
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:3.2.2")
+	}
+}
+
+plugins {
+    id "java-library"
+}
+
+ext {
+	lombokVersion = "1.18.24"
+}
+
+apply plugin: "org.springframework.boot"
+apply plugin: "com.github.node-gradle.node"
+apply plugin: "io.spring.dependency-management"
+
+group = "kr.andold.ics.helper"
+version = "0.0.1-SNAPSHOT"
+
+//	compatible gradle 7.5
+sourceCompatibility = 18
+targetCompatibility = 18
+
+repositories {
+	mavenCentral()
+	maven {
+		url = uri("https://maven.pkg.github.com/andold/utils")
+		credentials {
+			username = mavenUser
+			password = mavenPassword
+		}
+	}
+}
+
+dependencies {
+	implementation("kr.andold:utils:0.0.5-SNAPSHOT")
+
+	implementation("org.springframework.boot:spring-boot:3.3.1")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
+ 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	implementation("org.slf4j:jcl-over-slf4j:2.0.13")
+	implementation("org.slf4j:log4j-over-slf4j:2.0.13")
+	implementation("org.slf4j:jul-to-slf4j:2.0.13")
+	implementation("org.slf4j:slf4j-api:2.0.13")
+	implementation("ch.qos.logback:logback-core:1.5.6")
+	implementation("ch.qos.logback:logback-classic:1.5.6")
+
+	compileOnly("org.projectlombok:lombok:${lombokVersion}")
+	annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+	testCompileOnly("org.projectlombok:lombok:${lombokVersion}")
+	testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+
+	implementation("org.seleniumhq.selenium:selenium-java:4.15.0")
+	implementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
+	implementation("org.jsoup:jsoup:1.17.2")
+
+	testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
+	testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.3")
+	testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+test {
+	useJUnitPlatform()
+}
+
+jar {
+	manifest {
+		attributes 'Main-Class':'kr.andold.ics.helper.Main'
+	}
+}
+
+println "projectDir: $projectDir"
+if (project.hasProperty("profile")) {
+	println "profile: ${profile}"
+	sourceSets {
+		main {
+			resources {
+				srcDirs = ["src/main/resources", "src/main/resources-${profile}"]
+			}
+		}
+	}
+} else {
+	println "profile: null. maybe test environment."
+	sourceSets {
+		main {
+			resources {
+				srcDirs = ["src/main/resources", "src/test/resources", "src/test/resources-local"]
+			}
+		}
+	}
+}
+

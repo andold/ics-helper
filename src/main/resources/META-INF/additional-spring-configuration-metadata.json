@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "user.data.path",
+    "type": "java.lang.String",
+    "description": "A description for 'user.data.path'"
+  },
+  {
+    "name": "user.selenium.webdriver.chrome.driver",
+    "type": "java.lang.String",
+    "description": "A description for 'user.selenium.webdriver.chrome.driver'"
+  },
+  {
+    "name": "user.selenium.user.data.dir",
+    "type": "java.lang.String",
+    "description": "A description for 'user.selenium.user.data.dir'"
+  }
+]}
