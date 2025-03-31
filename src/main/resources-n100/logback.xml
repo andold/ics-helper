@@ -1,0 +1,52 @@
+<!DOCTYPE configuration>
+<configuration debug="true" scan="false" scanPeriod="30 seconds">
+	<property name="LOG_PATH" value="${LOG_PATH:-C:/logs/ics-helper}" />
+	<statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+	<springProperty scope="context" name="selenium" source="user.selenium.user.data.dir"/>
+	<appender name="selenium" class="ch.qos.logback.core.FileAppender">
+		<File>${selenium}/selenium.log</File>
+	</appender>
+
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<charset>UTF-8</charset>
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] %-48.48logger{48} :%4line %msg%n</Pattern>
+		</encoder>
+	</appender>
+	<appender name="general" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${LOG_PATH}/general.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/general.log.%i</fileNamePattern>
+			<maxIndex>9</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>4MB</maxFileSize>
+		</triggeringPolicy>
+		<encoder>
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] %-64.64logger{64} :%4line %msg%n</Pattern>
+		</encoder>
+	</appender>
+	<appender name="ics-helper" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${LOG_PATH}/ics-helper.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/ics-helper.log.%i</fileNamePattern>
+			<maxIndex>9</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>4MB</maxFileSize>
+		</triggeringPolicy>
+		<encoder>
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] %-48.48logger{48} :%4line %msg%n</Pattern>
+		</encoder>
+	</appender>
+
+	<logger name="kr.andold.ics.helper" additivity="false" level="debug">
+		<appender-ref ref="ics-helper" />
+	</logger>
+
+	<root level="warn">
+		<appender-ref ref="general" />
+	</root>
+
+</configuration>
