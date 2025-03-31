@@ -42,10 +42,12 @@
 	</appender>
 
 	<logger name="kr.andold.ics.helper" additivity="false" level="debug">
+		<appender-ref ref="console" />
 		<appender-ref ref="ics-helper" />
 	</logger>
 
 	<root level="warn">
+		<appender-ref ref="console" />
 		<appender-ref ref="general" />
 	</root>
 
