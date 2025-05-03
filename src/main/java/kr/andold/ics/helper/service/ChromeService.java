@@ -4,6 +4,7 @@ import java.io.File;
 import java.time.Duration;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -82,18 +83,23 @@ public class ChromeService {
 	}
 
 	public void crawl() {
-		log.info("{} crawl()", Utility.indentStart());
-		long started = System.currentTimeMillis();
+		Executors.newSingleThreadExecutor().execute(new Runnable() {
+			@Override
+			public void run() {
+				log.info("{} crawl()", Utility.indentStart());
+				long started = System.currentTimeMillis();
 
-		String filename = download();
-		if (filename == null || filename.isBlank()) {
-			return;
-		}
+				String filename = download();
+				if (filename == null || filename.isBlank()) {
+					return;
+				}
 
-		int count = upload(filename);
+				int count = upload(filename);
 
-		log.info("{} crawl() - {}", Utility.indentEnd(), count, Utility.toStringPastTimeReadable(started));
-		return;
+				log.info("{} crawl() - {}", Utility.indentEnd(), count, Utility.toStringPastTimeReadable(started));
+				return;
+			}
+		});
 	}
 
 	private int upload(String filename) {

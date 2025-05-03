@@ -16,7 +16,7 @@ plugins {
 }
 
 ext {
-	lombokVersion = "1.18.24"
+	lombokVersion = "1.18.30"
 }
 
 apply plugin: "org.springframework.boot"
@@ -26,9 +26,8 @@ apply plugin: "io.spring.dependency-management"
 group = "kr.andold.ics.helper"
 version = "0.0.1-SNAPSHOT"
 
-//	compatible gradle 7.5
-sourceCompatibility = 18
-targetCompatibility = 18
+sourceCompatibility = 21
+targetCompatibility = 21
 
 repositories {
 	mavenCentral()
@@ -42,9 +41,9 @@ repositories {
 }
 
 dependencies {
-	implementation("kr.andold:utils:0.0.5-SNAPSHOT")
+	implementation("kr.andold:utils:0.0.7-SNAPSHOT")
 
-	implementation("org.springframework.boot:spring-boot:3.3.1")
+	implementation("org.springframework.boot:spring-boot:3.2.4")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
  	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
