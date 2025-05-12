@@ -19,8 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 		loader = AnnotationConfigContextLoader.class
 )
 @PropertySource("classpath:application.properties")
-public class ChromeServiceTest {
-	@Autowired private ChromeService service;
+public class CrawlNaverServiceTest {
+	@Autowired private CrawlNaverService service;
 
 	@BeforeEach
 	public void before() {

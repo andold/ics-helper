@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
-import kr.andold.ics.helper.service.ChromeService;
+import kr.andold.ics.helper.service.CrawlNaverService;
 import kr.andold.utils.Utility;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,7 +46,7 @@ public class MainFrame extends JFrame implements ActionListener {
 	private static final int COLUMN_SIZE = 5;
 	
 	@Autowired
-	private ChromeService chromeService;
+	private CrawlNaverService crawlNaverService;
 
 	public MainFrame() {
 		getContentPane().setLayout(new GridLayout(1, 0, 0, 0));
@@ -69,12 +69,12 @@ public class MainFrame extends JFrame implements ActionListener {
 	}
 
 	private void initBrowsers() {
-		log.info("{} initBrowsers()", Utility.indentMiddle());
+		log.info("{} initBrowsers()", Utility.indentStart());
 
 		setSize(sizeByScreen(COLUMN_SIZE, 2));
 		setLocation(locationByScreen(0, 0));
 
-		log.info("{} initBrowsers()", Utility.indentMiddle());
+		log.info("{} initBrowsers()", Utility.indentEnd());
 	}
 
 	public static List<java.awt.Component> getAllComponents(Container c) {
@@ -109,12 +109,16 @@ public class MainFrame extends JFrame implements ActionListener {
 
 	@PostConstruct
 	public void init() {
+		log.info("{} @PostConstruct init()", Utility.indentStart());
+
 		this.setTitle("ICS Helper");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 
 		initBrowsers();
+
+		log.info("{} @PostConstruct init()", Utility.indentEnd());
 	}
 
 	private void createMenu(JMenu menu, String title, boolean enabled) {
@@ -142,7 +146,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		String command = e.getActionCommand();
 		switch (command) { // 메뉴 아이템 구분
 		case "네이버":
-			chromeService.crawl();
+			crawlNaverService.crawl();
 			break;
 		case "닫기":
 			System.exit(0); // 시스템 종료
