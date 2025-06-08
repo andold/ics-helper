@@ -86,18 +86,18 @@ public class CrawlNaverService {
 		driver.quit();
 	}
 
-	public void crawl() {
+	public void crawlIcs() {
 		Executors.newSingleThreadExecutor().execute(new Runnable() {
 			@Override
 			public void run() {
-				log.info("{} crawl()", Utility.indentStart());
+				log.info("{} crawlIcs()", Utility.indentStart());
 				long started = System.currentTimeMillis();
 
 				int count = crawlCalendar("개인");
 				count += crawlCalendar("집안일");
 				count += deduplicate();
 
-				log.info("{} crawl() - {}", Utility.indentEnd(), count, Utility.toStringPastTimeReadable(started));
+				log.info("{} crawlIcs() - {}", Utility.indentEnd(), count, Utility.toStringPastTimeReadable(started));
 				return;
 			}
 		});

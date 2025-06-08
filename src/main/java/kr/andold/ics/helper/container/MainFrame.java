@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
+import kr.andold.ics.helper.service.CrawlGoogleService;
 import kr.andold.ics.helper.service.CrawlNaverService;
 import kr.andold.utils.Utility;
 import lombok.extern.slf4j.Slf4j;
@@ -44,9 +45,11 @@ import java.awt.event.ActionListener;
 public class MainFrame extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private static final int COLUMN_SIZE = 5;
+	private static final String CRAWL_ICS_NAVER = "일정: 네이버";
+	private static final String CRAWL_CONTACT_GOOGLE = "연락처: 구글";
 	
-	@Autowired
-	private CrawlNaverService crawlNaverService;
+	@Autowired private CrawlNaverService crawlNaverService;
+	@Autowired private CrawlGoogleService crawlGoogleService;
 
 	public MainFrame() {
 		getContentPane().setLayout(new GridLayout(1, 0, 0, 0));
@@ -132,7 +135,8 @@ public class MainFrame extends JFrame implements ActionListener {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menuBank = new JMenu("항목");
 		menuBar.add(menuBank);
-		createMenu(menuBank, "네이버", true);
+		createMenu(menuBank, CRAWL_ICS_NAVER, true);
+		createMenu(menuBank, CRAWL_CONTACT_GOOGLE, true);
 		menuBank.addSeparator();
 		createMenu(menuBank, "닫기", true);
 
@@ -145,8 +149,11 @@ public class MainFrame extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		String command = e.getActionCommand();
 		switch (command) { // 메뉴 아이템 구분
-		case "네이버":
-			crawlNaverService.crawl();
+		case CRAWL_ICS_NAVER:
+			crawlNaverService.crawlIcs();
+			break;
+		case CRAWL_CONTACT_GOOGLE:
+			crawlGoogleService.crawlContact();
 			break;
 		case "닫기":
 			System.exit(0); // 시스템 종료

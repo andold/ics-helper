@@ -30,7 +30,7 @@ public class CrawlNaverServiceTest {
 	@Test
 	public void testCrawl() {
 		assertNotNull(service);
-		service.crawl();
+		service.crawlIcs();
 	}
 
 }
