@@ -67,5 +67,4 @@ public class ChromeDriverClient {
 		driver.quit();
 	}
 
-
 }

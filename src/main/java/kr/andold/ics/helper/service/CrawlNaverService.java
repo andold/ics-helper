@@ -93,8 +93,10 @@ public class CrawlNaverService {
 				log.info("{} crawlIcs()", Utility.indentStart());
 				long started = System.currentTimeMillis();
 
-				int count = crawlCalendar("개인");
+				int count = 0;
+				count = crawlCalendar("개인");
 				count += crawlCalendar("집안일");
+				count += crawlCalendar("공용");
 				count += deduplicate();
 
 				log.info("{} crawlIcs() - {}", Utility.indentEnd(), count, Utility.toStringPastTimeReadable(started));

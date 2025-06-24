@@ -6,31 +6,29 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import kr.andold.utils.Utility;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootTest
-@ContextConfiguration(
-		loader = AnnotationConfigContextLoader.class
-)
-@PropertySource("classpath:application.properties")
 public class CrawlNaverServiceTest {
 	@Autowired private CrawlNaverService service;
 
 	@BeforeEach
 	public void before() {
 		log.info(Utility.HR);
+		assertNotNull(service);
 	}
 
 	@Test
 	public void testCrawl() {
-		assertNotNull(service);
 		service.crawlIcs();
+	}
+
+	@Test
+	public void crawlCalendar() {
+		service.crawlCalendar("공용");
 	}
 
 }
