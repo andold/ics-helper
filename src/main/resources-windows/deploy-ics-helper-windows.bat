@@ -1,6 +1,6 @@
 @SET PROJECT=ics-helper
 @SET VERSION=0.0.1-SNAPSHOT
-@SET PROFILE=n100
+@SET PROFILE=windows
 @SET SOURCE_PATH=C:\src\github\%PROJECT%
 @SET CURRENT_PATH=%~dp0
 @SET CURRENT_FILENAME=%~nx0
@@ -35,3 +35,4 @@ CD  ..
 ECHO %CURRENT_FILENAME%
 COPY /Y %SOURCE_PATH%\src\main\resources-%PROFILE%\install-%PROJECT%-%PROFILE%.bat
 COPY /Y %SOURCE_PATH%\src\main\resources-%PROFILE%\run-%PROJECT%.bat
+COPY /Y %SOURCE_PATH%\src\main\resources-%PROFILE%\%PROJECT%.ico
