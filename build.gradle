@@ -41,7 +41,7 @@ repositories {
 }
 
 dependencies {
-	implementation("kr.andold:utils:0.1.0-SNAPSHOT")
+	implementation("kr.andold:utils:0.1.1")
 
 	implementation("org.springframework.boot:spring-boot:3.2.4")
 	implementation("org.springframework.boot:spring-boot-starter-validation")

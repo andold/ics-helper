@@ -401,7 +401,7 @@ public class CrawlNaverService {
 		//	파일선택	/html/body/div[3]/div/div/div[2]/form/div[1]/div/input
 		By BY_XPATH_FILE_SELECT = By.xpath("//form//input[contains(@type,'file')]");
 		log.debug("{} navigateUpload(...) - 『{}』『{}』", Utility.indentMiddle(), "파일선택", driver.getText(BY_XPATH_FILE_SELECT, Duration.ZERO));
-		driver.presenceOfElementLocated(BY_XPATH_FILE_SELECT, DEFAULT_TIMEOUT_DURATION);
+		driver.waitUntilExist(BY_XPATH_FILE_SELECT, true, DEFAULT_TIMEOUT_DURATION);
 		log.debug("{} navigateUpload(...) - 『{}』『{}』", Utility.indentMiddle(), "파일선택", driver.getText(BY_XPATH_FILE_SELECT, Duration.ZERO));
 	}
 
