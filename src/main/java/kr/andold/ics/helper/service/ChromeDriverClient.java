@@ -23,7 +23,7 @@ public class ChromeDriverClient {
 
 	@Getter
 	private static String userSeleniumWebdriverChromeDriver;
-	@Value("${user.selenium.webdriver.chrome.driver}")
+	@Value("${user.selenium.webdriver.chrome.driver:}")
 	public void setUserSeleniumWebdriverChromeDriver(String value) {
 		log.info("{} setUserSeleniumWebdriverChromeDriver(『{}』)", Utility.indentMiddle(), value);
 		userSeleniumWebdriverChromeDriver = value;
@@ -41,7 +41,10 @@ public class ChromeDriverClient {
 	public void postConstruct() {
 		log.info("{} postConstruct()", Utility.indentStart());
 
-		System.setProperty("webdriver.chrome.driver", getUserSeleniumWebdriverChromeDriver());
+		//	경로 미지정 시 Selenium Manager가 설치된 Chrome 버전에 맞는 드라이버를 자동으로 받는다
+		if (getUserSeleniumWebdriverChromeDriver() != null && !getUserSeleniumWebdriverChromeDriver().isBlank()) {
+			System.setProperty("webdriver.chrome.driver", getUserSeleniumWebdriverChromeDriver());
+		}
 		ChromeOptions chromeOptions = new ChromeOptions();
 		chromeOptions.addArguments("--disable-blink-features=AutomationControlled");
 		chromeOptions.addArguments("--disable-dev-shm-usage");

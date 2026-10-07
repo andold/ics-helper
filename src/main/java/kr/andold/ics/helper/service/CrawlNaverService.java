@@ -34,7 +34,7 @@ public class CrawlNaverService {
 
 	@Getter
 	private static String webdriverPath;
-	@Value("${user.selenium.webdriver.chrome.driver:C:/apps/chromedriver-win64/chromedriver.exe}")
+	@Value("${user.selenium.webdriver.chrome.driver:}")
 	public void setWebdriverPath(String value) {
 		log.info("{} setWebdriverPath(『{}』)", Utility.indentMiddle(), value);
 		webdriverPath = value;
@@ -60,7 +60,10 @@ public class CrawlNaverService {
 	public void postConstruct() {
 		log.info("{} postConstruct()", Utility.indentStart());
 
-		System.setProperty("webdriver.chrome.driver", getWebdriverPath());
+		//	경로 미지정 시 Selenium Manager가 설치된 Chrome 버전에 맞는 드라이버를 자동으로 받는다
+		if (getWebdriverPath() != null && !getWebdriverPath().isBlank()) {
+			System.setProperty("webdriver.chrome.driver", getWebdriverPath());
+		}
 		ChromeOptions chromeOptions = new ChromeOptions();
 		chromeOptions.addArguments("--disable-blink-features=AutomationControlled");
 		chromeOptions.addArguments("--disable-dev-shm-usage");
