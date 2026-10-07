@@ -51,7 +51,7 @@ public class CrawlNaverService {
 
 	@Getter
 	private static String userUploadUrl;
-	@Value("${user.upload.url:http://localhost/ics/}")
+	@Value("${user.upload.url:http://dev.andold.kr/ics/}")
 	public void setUserUploadUrl(String value) {
 		log.info("{} setUserUploadUrl(『{}』)", Utility.indentMiddle(), value);
 		userUploadUrl = value;
