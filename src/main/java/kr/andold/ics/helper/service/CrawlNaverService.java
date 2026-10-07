@@ -28,6 +28,7 @@ public class CrawlNaverService {
 
 	private static final Duration DEFAULT_TIMEOUT_DURATION = Duration.ofSeconds(4);
 	private static final Duration DEFAULT_TIMEOUT_DURATION_LONG = Duration.ofMinutes(5);
+	private static final Duration UPLOAD_LOGIN_TIMEOUT_DURATION = Duration.ofMinutes(5);
 	private static final Integer VCALENDAR_ID = 1028;
 	private static final boolean fHeadless = false;
 	ChromeDriverWrapper driver;
@@ -304,7 +305,9 @@ public class CrawlNaverService {
 			String windowHandle = (String) windowHandles.toArray()[0];
 			driver.switchTo().window(windowHandle);
 
-			navigateUpload(driver);
+			if (!navigateUpload(driver)) {
+				throw new IllegalStateException("업로드 창을 열지 못했습니다: " + getUserUploadUrl());
+			}
 
 			driver.manage().timeouts().implicitlyWait(DEFAULT_TIMEOUT_DURATION);
 
@@ -390,22 +393,60 @@ public class CrawlNaverService {
 		return count;
 	}
 
-	private void navigateUpload(ChromeDriverWrapper driver) {
-		driver.manage().timeouts().implicitlyWait(DEFAULT_TIMEOUT_DURATION_LONG);
-		driver.get(getUserUploadUrl());
-		
+	//	'올리기'를 클릭해 파일선택 input이 나타날 때까지 반복한다.
+	//	로그인 창이 뜨면 로그인이 끝날 때까지 기다렸다가 '올리기'를 다시 클릭한다. #6
+	private boolean navigateUpload(ChromeDriverWrapper driver) {
+		log.info("{} navigateUpload(...)", Utility.indentStart());
+		long started = System.currentTimeMillis();
+
+		String url = getUserUploadUrl();
 		//	올리기	//*[@id="root"]/div/div[1]/div[3]/div/button[3]
 		By BY_XPATH_UPLOAD_BUTTON = By.xpath("//*[@id='root']//div[contains(@class,'col-auto')]/div/button[contains(text(),'올리기')]");
-		log.debug("{} navigateUpload(...) - 『{}』『{}』", Utility.indentMiddle(), "올리기", driver.getText(BY_XPATH_UPLOAD_BUTTON, Duration.ZERO));
-		driver.presenceOfElementLocated(BY_XPATH_UPLOAD_BUTTON, DEFAULT_TIMEOUT_DURATION);
-		driver.clickIfExist(BY_XPATH_UPLOAD_BUTTON);
-		log.debug("{} navigateUpload(...) - 『{}』『{}』", Utility.indentMiddle(), "올리기", driver.getText(BY_XPATH_UPLOAD_BUTTON, Duration.ZERO));
-
 		//	파일선택	/html/body/div[3]/div/div/div[2]/form/div[1]/div/input
 		By BY_XPATH_FILE_SELECT = By.xpath("//form//input[contains(@type,'file')]");
-		log.debug("{} navigateUpload(...) - 『{}』『{}』", Utility.indentMiddle(), "파일선택", driver.getText(BY_XPATH_FILE_SELECT, Duration.ZERO));
-		driver.waitUntilExist(BY_XPATH_FILE_SELECT, true, DEFAULT_TIMEOUT_DURATION);
-		log.debug("{} navigateUpload(...) - 『{}』『{}』", Utility.indentMiddle(), "파일선택", driver.getText(BY_XPATH_FILE_SELECT, Duration.ZERO));
+		//	로그인 창
+		By BY_XPATH_PASSWORD = By.xpath("//input[contains(@type,'password')]");
+
+		driver.manage().timeouts().implicitlyWait(Duration.ZERO);
+		driver.get(url);
+
+		long offPageSince = 0;
+		while (System.currentTimeMillis() - started < UPLOAD_LOGIN_TIMEOUT_DURATION.toMillis()) {
+			if (!driver.findElements(BY_XPATH_PASSWORD).isEmpty()) {
+				log.info("{} navigateUpload(...) - 로그인 대기중 - 『{}』", Utility.indentMiddle(), driver.getCurrentUrl());
+				offPageSince = 0;
+				Utility.sleep(1000);
+				continue;
+			}
+
+			if (!driver.getCurrentUrl().startsWith(url)) {
+				//	로그인 후 업로드 페이지로 돌아오지 않으면 직접 이동한다
+				if (offPageSince == 0) {
+					offPageSince = System.currentTimeMillis();
+				}
+				if (System.currentTimeMillis() - offPageSince < DEFAULT_TIMEOUT_DURATION.toMillis()) {
+					log.info("{} navigateUpload(...) - 업로드 페이지 밖 - 『{}』", Utility.indentMiddle(), driver.getCurrentUrl());
+					Utility.sleep(1000);
+					continue;
+				}
+				driver.get(url);
+			}
+			offPageSince = 0;
+
+			log.debug("{} navigateUpload(...) - 『{}』『{}』", Utility.indentMiddle(), "올리기", driver.getText(BY_XPATH_UPLOAD_BUTTON, Duration.ZERO));
+			if (driver.waitUntilExist(BY_XPATH_UPLOAD_BUTTON, true, DEFAULT_TIMEOUT_DURATION)) {
+				driver.clickIfExist(BY_XPATH_UPLOAD_BUTTON);
+			}
+
+			log.debug("{} navigateUpload(...) - 『{}』『{}』", Utility.indentMiddle(), "파일선택", driver.getText(BY_XPATH_FILE_SELECT, Duration.ZERO));
+			if (driver.waitUntilExist(BY_XPATH_FILE_SELECT, true, DEFAULT_TIMEOUT_DURATION)) {
+				log.info("{} true - navigateUpload(...) - {}", Utility.indentEnd(), Utility.toStringPastTimeReadable(started));
+				return true;
+			}
+		}
+
+		log.warn("{} false - navigateUpload(...) - {}", Utility.indentEnd(), Utility.toStringPastTimeReadable(started));
+		return false;
 	}
 
 	private String waitUntilDownloadComplete(Set<String> donwloadFiles) {
